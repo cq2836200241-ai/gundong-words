@@ -1,0 +1,76 @@
+/* Word track layout */
+.word-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  pointer-events: auto; /* Required so clicks work on transparent window */
+}
+
+/* Horizontal mode */
+.word-track.horizontal {
+  flex-direction: row;
+  height: 100vh;
+  align-items: center;
+}
+
+.word-item.horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  padding: 0 30px;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.word-item.horizontal:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.word-item.horizontal .word-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 12px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.word-item.horizontal .meaning-text {
+  font-size: 13px;
+  color: #ddd;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Vertical mode */
+.word-track.vertical {
+  flex-direction: column;
+  width: 100vw;
+  height: max-content;
+}
+
+.word-item.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  cursor: pointer;
+}
+
+.word-item.vertical:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.word-item.vertical .word-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.word-item.vertical .meaning-text {
+  font-size: 13px;
+  color: #ddd;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}

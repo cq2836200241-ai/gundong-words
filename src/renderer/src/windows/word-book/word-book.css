@@ -1,0 +1,96 @@
+.word-book-layout {
+  display: flex;
+  height: 100vh;
+  background: var(--bg-color);
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--surface-color);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+}
+
+.book-list {
+  list-style: none;
+  flex: 1;
+}
+
+.book-list li {
+  padding: 12px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.book-list li:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.book-list li.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.create-btn, .import-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.create-btn:hover, .import-btn:hover {
+  background: #818cf8;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.word-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.word-table th {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.word-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.font-bold {
+  font-weight: bold;
+  font-size: 15px;
+}
