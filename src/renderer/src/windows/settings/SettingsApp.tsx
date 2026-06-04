@@ -4,16 +4,27 @@ import './settings.css';
 
 const SettingsApp: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [playingBookName, setPlayingBookName] = useState<string>('无');
 
   useEffect(() => {
     window.electronAPI?.getSettings().then(setSettings);
+    
+    window.electronAPI?.listWordBooks().then(books => {
+      const active = books.find(b => b.isActive);
+      if (active) setPlayingBookName(active.name);
+    });
 
     const cleanup = window.electronAPI?.onSettingsUpdate((partial) => {
       setSettings(prev => prev ? { ...prev, ...partial } : null);
     });
+    
+    const unPlayback = window.electronAPI?.onPlaybackUpdate?.((data) => {
+      if (data.bookName) setPlayingBookName(data.bookName);
+    });
 
     return () => {
       if (cleanup) cleanup();
+      if (unPlayback) unPlayback();
     };
   }, []);
 
@@ -47,6 +58,14 @@ const SettingsApp: React.FC = () => {
         {/* Quick Actions */}
         <section className="settings-section">
           <h2>快捷操作</h2>
+          
+          <div className="setting-item" style={{ marginBottom: '15px' }}>
+            <div className="setting-label">当前正在播放：</div>
+            <div className="setting-control" style={{ fontWeight: 'bold', color: 'var(--primary-color, #4caf50)' }}>
+              {playingBookName}
+            </div>
+          </div>
+          
           <div className="quick-actions">
             <button className="btn primary" onClick={() => window.electronAPI?.togglePlayback()}>
               暂停 / 恢复滚动
@@ -69,6 +88,18 @@ const SettingsApp: React.FC = () => {
                 <option value="left">屏幕左侧</option>
                 <option value="right">屏幕右侧</option>
               </select>
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-label">置顶显示</div>
+            <div className="setting-control" style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+              <input 
+                type="checkbox" 
+                checked={settings.dock.alwaysOnTop ?? true} 
+                onChange={(e) => handleUpdate({ dock: { ...settings.dock, alwaysOnTop: e.target.checked } })}
+                style={{ width: '18px', height: '18px', cursor: 'pointer', margin: 0 }}
+              />
             </div>
           </div>
 
@@ -108,6 +139,54 @@ const SettingsApp: React.FC = () => {
               />
             </div>
           </div>
+
+          <div className="setting-item">
+            <div className="setting-label">单词颜色</div>
+            <div className="setting-control">
+              <input 
+                type="color" 
+                value={settings.theme?.wordColor || '#ffffff'} 
+                onChange={(e) => handleUpdate({ theme: { ...settings.theme, wordColor: e.target.value } })}
+                style={{ width: '50px', padding: '0', height: '30px', cursor: 'pointer' }}
+              />
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-label">解释颜色</div>
+            <div className="setting-control">
+              <input 
+                type="color" 
+                value={settings.theme?.meaningColor || '#dddddd'} 
+                onChange={(e) => handleUpdate({ theme: { ...settings.theme, meaningColor: e.target.value } })}
+                style={{ width: '50px', padding: '0', height: '30px', cursor: 'pointer' }}
+              />
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-label">词组间距缩放 ({settings.layout?.moduleSpacingScale || 1.0}x)</div>
+            <div className="setting-control">
+              <input 
+                type="range" 
+                min="0.5" max="3.0" step="0.1" 
+                value={settings.layout?.moduleSpacingScale || 1.0} 
+                onChange={(e) => handleUpdate({ layout: { ...(settings.layout || { moduleSpacingScale: 1.0, wordMeaningSpacingScale: 1.0 }), moduleSpacingScale: parseFloat(e.target.value) } })}
+              />
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-label">单词翻译间距 ({settings.layout?.wordMeaningSpacingScale || 1.0}x)</div>
+            <div className="setting-control">
+              <input 
+                type="range" 
+                min="0.5" max="3.0" step="0.1" 
+                value={settings.layout?.wordMeaningSpacingScale || 1.0} 
+                onChange={(e) => handleUpdate({ layout: { ...(settings.layout || { moduleSpacingScale: 1.0, wordMeaningSpacingScale: 1.0 }), wordMeaningSpacingScale: parseFloat(e.target.value) } })}
+              />
+            </div>
+          </div>
         </section>
 
         {/* Scroll Settings */}
@@ -138,7 +217,7 @@ const SettingsApp: React.FC = () => {
             <div className="setting-control">
               <input 
                 type="range" 
-                min="0.5" max="3.0" step="0.1" 
+                min="0.1" max="3.0" step="0.1" 
                 value={settings.scroll.speed} 
                 onChange={(e) => handleScrollChange('speed', parseFloat(e.target.value))}
               />

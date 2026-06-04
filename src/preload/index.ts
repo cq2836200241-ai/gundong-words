@@ -38,6 +38,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener(IPC_CHANNELS.PLAYBACK_UPDATE, handler);
   },
 
+  onPlaybackToggle: (callback: (data: { isPaused: boolean }) => void) => {
+    const handler = (_event: any, data: { isPaused: boolean }) => callback(data);
+    ipcRenderer.on(IPC_CHANNELS.PLAYBACK_TOGGLE, handler);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.PLAYBACK_TOGGLE, handler);
+  },
+
   onWordAdded: (callback: (data: any) => void) => {
     const handler = (_event: any, data: any) => callback(data);
     ipcRenderer.on(IPC_CHANNELS.PLAYBACK_WORD_ADDED, handler);

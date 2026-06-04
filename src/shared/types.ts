@@ -6,6 +6,7 @@ export type ScrollDirection = 'forward' | 'reverse';
 export interface DockConfig {
   position: DockPosition;
   thickness: number; // px, 默认: top 为 40, left/right 为 55
+  alwaysOnTop: boolean;
 }
 
 export interface DockChangeEvent {
@@ -70,6 +71,7 @@ export interface AppSettings {
   dock: {
     position: DockPosition;
     thickness: number;
+    alwaysOnTop: boolean;
   };
   scroll: {
     direction: ScrollDirection;
@@ -82,6 +84,12 @@ export interface AppSettings {
   theme: {
     backgroundColor: string;
     backgroundOpacity: number;
+    wordColor: string;
+    meaningColor: string;
+  };
+  layout: {
+    moduleSpacingScale: number;
+    wordMeaningSpacingScale: number;
   };
   hotkey: {
     captureKey: string; // default 'W+Space'
@@ -95,10 +103,11 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  dock: { position: 'top', thickness: 40 },
+  dock: { position: 'top', thickness: 40, alwaysOnTop: true },
   scroll: { direction: 'forward', speed: 1.0 },
   font: { wordSize: 16, meaningSize: 13 },
-  theme: { backgroundColor: '#000000', backgroundOpacity: 0.85 },
+  theme: { backgroundColor: '#000000', backgroundOpacity: 0.85, wordColor: '#ffffff', meaningColor: '#dddddd' },
+  layout: { moduleSpacingScale: 1.0, wordMeaningSpacingScale: 1.0 },
   hotkey: { captureKey: 'W+Space' },
   deepseek: { apiKey: '', baseUrl: 'https://api.deepseek.com', model: 'deepseek-chat' },
   activeBookId: null

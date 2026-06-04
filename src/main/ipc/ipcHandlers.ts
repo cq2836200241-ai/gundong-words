@@ -37,6 +37,13 @@ export function setupIpcHandlers(
     if (partial.dock?.position !== undefined || partial.dock?.thickness !== undefined) {
       scrollBarManager.switchDock(settingsManager.get('dock').position);
     }
+    
+    if (partial.dock?.alwaysOnTop !== undefined) {
+      const win = scrollBarManager.getWindow();
+      if (win && !win.isDestroyed()) {
+        win.setAlwaysOnTop(partial.dock.alwaysOnTop, 'screen-saver');
+      }
+    }
   });
 
   // Windows

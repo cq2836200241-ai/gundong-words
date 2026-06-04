@@ -9,7 +9,8 @@ export function useScrollAnimation(
   copies: number,
   orientation: ScrollOrientation,
   direction: ScrollDirection,
-  speed: number
+  speed: number,
+  isPaused: boolean = false
 ) {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
@@ -55,6 +56,10 @@ export function useScrollAnimation(
       });
     }
 
+    if (isPaused) {
+      tl.pause();
+    }
+
     tlRef.current = tl;
 
     return () => { tl.kill(); };
@@ -66,8 +71,12 @@ export function useScrollAnimation(
     }
   }, [speed]);
 
-  return {
-    pause: () => tlRef.current?.pause(),
-    resume: () => tlRef.current?.resume(),
-  };
+  useEffect(() => {
+    if (tlRef.current) {
+      if (isPaused) tlRef.current.pause();
+      else tlRef.current.resume();
+    }
+  }, [isPaused]);
+
+  return {};
 }

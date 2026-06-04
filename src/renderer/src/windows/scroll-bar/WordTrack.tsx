@@ -8,21 +8,24 @@ interface Props {
   orientation: 'horizontal' | 'vertical';
   direction: 'forward' | 'reverse';
   speed: number;
+  isGlobalPaused?: boolean;
 }
 
-export function WordTrack({ words, orientation, direction, speed }: Props) {
+export function WordTrack({ words, orientation, direction, speed, isGlobalPaused = false }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
   const [copies, setCopies] = useState(2);
+  const [isHovered, setIsHovered] = useState(false);
   
-  const { pause, resume } = useScrollAnimation(
+  useScrollAnimation(
     trackRef, 
     groupRef,
     words.length, 
     copies,
     orientation, 
     direction, 
-    speed
+    speed,
+    isHovered || isGlobalPaused
   );
 
   // Dynamically calculate how many copies we need to fill the screen
@@ -67,8 +70,8 @@ export function WordTrack({ words, orientation, direction, speed }: Props) {
     <div 
       className={`word-track ${orientation}`} 
       ref={trackRef}
-      onMouseEnter={pause}
-      onMouseLeave={resume}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Primary group that we measure */}
       <div className="word-group" ref={groupRef}>

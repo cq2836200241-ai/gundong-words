@@ -19,6 +19,7 @@ export interface ElectronAPI {
   
   onDockChanged: (callback: (data: DockChangeEvent) => void) => () => void;
   onPlaybackUpdate: (callback: (data: { bookId: number; bookName: string; words: Word[] }) => void) => () => void;
+  onPlaybackToggle: (callback: (data: { isPaused: boolean }) => void) => () => void;
   onWordAdded: (callback: (data: { word: Word; bookId: number }) => void) => () => void;
   onSettingsUpdate: (callback: (data: Partial<AppSettings>) => void) => () => void;
 }

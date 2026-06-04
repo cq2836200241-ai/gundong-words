@@ -58,7 +58,9 @@ export function ScrollBarApp() {
   const [orientation, setOrientation] = useState<'horizontal'|'vertical'>('horizontal');
   const [direction, setDirection] = useState<'forward'|'reverse'>('forward');
   const [speed, setSpeed] = useState(1.0);
-  const [theme, setTheme] = useState({ backgroundColor: '#000000', backgroundOpacity: 0.85 });
+  const [theme, setTheme] = useState({ backgroundColor: '#000000', backgroundOpacity: 0.85, wordColor: '#ffffff', meaningColor: '#dddddd' });
+  const [layout, setLayout] = useState({ moduleSpacingScale: 1.0, wordMeaningSpacingScale: 1.0 });
+  const [isGlobalPaused, setIsGlobalPaused] = useState(false);
 
   useEffect(() => {
     const api = window.electronAPI;
@@ -73,7 +75,8 @@ export function ScrollBarApp() {
     api.getSettings().then((settings: AppSettings) => {
       setDirection(settings.scroll.direction);
       setSpeed(settings.scroll.speed);
-      setTheme(settings.theme || { backgroundColor: '#000000', backgroundOpacity: 0.85 });
+      setTheme(settings.theme || { backgroundColor: '#000000', backgroundOpacity: 0.85, wordColor: '#ffffff', meaningColor: '#dddddd' });
+      setLayout(settings.layout || { moduleSpacingScale: 1.0, wordMeaningSpacingScale: 1.0 });
       // We'll get orientation from dock:changed event initially or it defaults
     }).catch((error) => {
       console.error('Failed to load settings:', error);
@@ -87,6 +90,10 @@ export function ScrollBarApp() {
       setWords(data.words || []);
     });
 
+    const unPlaybackToggle = api.onPlaybackToggle?.((data: { isPaused: boolean }) => {
+      setIsGlobalPaused(data.isPaused);
+    });
+
     const unWordAdded = api.onWordAdded((data: { word: Word }) => {
       setWords(prev => [data.word, ...prev]);
     });
@@ -95,23 +102,35 @@ export function ScrollBarApp() {
       if (partial.scroll?.direction) setDirection(partial.scroll.direction);
       if (partial.scroll?.speed) setSpeed(partial.scroll.speed);
       if (partial.theme) setTheme(prev => ({ ...prev, ...partial.theme }));
+      if (partial.layout) setLayout(prev => ({ ...prev, ...partial.layout }));
     });
 
     return () => {
       unDock(); unUpdate(); unWordAdded(); unSettings();
+      if (unPlaybackToggle) unPlaybackToggle();
     };
   }, []);
 
   return (
     <div 
       className="scroll-bar-container" 
-      style={{ backgroundColor: hexToRgba(theme.backgroundColor, theme.backgroundOpacity), width: '100%', height: '100%', overflow: 'hidden' }}
+      style={{ 
+        backgroundColor: hexToRgba(theme.backgroundColor, theme.backgroundOpacity), 
+        width: '100%', 
+        height: '100%', 
+        overflow: 'hidden',
+        '--word-color': theme.wordColor || '#ffffff',
+        '--meaning-color': theme.meaningColor || '#dddddd',
+        '--module-spacing-scale': layout.moduleSpacingScale ?? 1.0,
+        '--word-meaning-gap-scale': layout.wordMeaningSpacingScale ?? 1.0
+      } as any}
     >
       <WordTrack 
         words={words} 
         orientation={orientation} 
         direction={direction} 
         speed={speed} 
+        isGlobalPaused={isGlobalPaused}
       />
     </div>
   );

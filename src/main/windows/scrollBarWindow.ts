@@ -22,7 +22,7 @@ export class ScrollBarWindowManager {
       transparent: true,
       backgroundColor: '#00000000',
       frame: false,
-      alwaysOnTop: true,
+      alwaysOnTop: settingsManager.get('dock').alwaysOnTop ?? true,
       skipTaskbar: !isDev,
       resizable: false,
       focusable: isDev,
@@ -92,7 +92,7 @@ export class ScrollBarWindowManager {
     this.currentBounds = bounds;
     this.currentOrientation = orientation as 'horizontal' | 'vertical';
     this.window.setBounds(bounds, true);
-    this.window.setAlwaysOnTop(true, 'screen-saver');
+    this.window.setAlwaysOnTop(settingsManager.get('dock').alwaysOnTop ?? true, 'screen-saver');
     this.show();
 
     if (this.rendererReady) this.sendDockChanged();

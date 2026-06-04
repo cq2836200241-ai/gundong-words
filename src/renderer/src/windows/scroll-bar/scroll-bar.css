@@ -36,12 +36,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 85vh;
+  padding: 0 calc(max(85vh, 40px) * var(--module-spacing-scale, 1));
   white-space: nowrap;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s;
   pointer-events: auto;
+  flex-shrink: 0;
 }
 
 .word-item.horizontal:hover {
@@ -49,18 +50,21 @@
 }
 
 .word-item.horizontal .word-text {
-  font-size: 45.7vh;
+  font-size: max(75vh, 16px);
   font-weight: 600;
   line-height: 1;
-  margin-right: 34.2vh;
+  color: var(--word-color, #ffffff);
+  margin-right: calc(max(30vh, 12px) * var(--word-meaning-gap-scale, 1));
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  flex-shrink: 0;
 }
 
 .word-item.horizontal .meaning-text {
-  font-size: 37.1vh;
+  font-size: max(60vh, 14px);
   line-height: 1;
-  color: #ddd;
+  color: var(--meaning-color, #dddddd);
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  flex-shrink: 0;
 }
 
 /* Vertical mode */
@@ -81,7 +85,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 37.5vw 12.5vw;
+  padding: calc(37.5vw * var(--module-spacing-scale, 1)) 12.5vw;
   text-align: center;
   cursor: pointer;
   pointer-events: auto;
@@ -96,7 +100,8 @@
 .word-item.vertical .word-text {
   font-size: 20vw;
   font-weight: 600;
-  margin-bottom: 7.5vw;
+  color: var(--word-color, #ffffff);
+  margin-bottom: calc(7.5vw * var(--word-meaning-gap-scale, 1));
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   white-space: nowrap;
   max-width: 100%;
@@ -104,7 +109,7 @@
 
 .word-item.vertical .meaning-text {
   font-size: 16.2vw;
-  color: #ddd;
+  color: var(--meaning-color, #dddddd);
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   word-break: break-word;
 }
