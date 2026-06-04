@@ -58,6 +58,13 @@ export interface WordBookCreateInput {
   description?: string;
 }
 
+export interface ImportResult {
+  total: number;
+  imported: number;
+  skipped: number;
+  errors: string[];
+}
+
 // === Settings ===
 export interface AppSettings {
   dock: {
@@ -72,7 +79,10 @@ export interface AppSettings {
     wordSize: number; // px, default 16
     meaningSize: number; // px, default 13
   };
-  opacity: number; // 0.25 - 1.0, default 0.85
+  theme: {
+    backgroundColor: string;
+    backgroundOpacity: number;
+  };
   hotkey: {
     captureKey: string; // default 'W+Space'
   };
@@ -88,7 +98,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   dock: { position: 'top', thickness: 40 },
   scroll: { direction: 'forward', speed: 1.0 },
   font: { wordSize: 16, meaningSize: 13 },
-  opacity: 0.85,
+  theme: { backgroundColor: '#000000', backgroundOpacity: 0.85 },
   hotkey: { captureKey: 'W+Space' },
   deepseek: { apiKey: '', baseUrl: 'https://api.deepseek.com', model: 'deepseek-chat' },
   activeBookId: null
@@ -99,6 +109,7 @@ export const IPC_CHANNELS = {
   DOCK_CHANGED: 'dock:changed',
   DOCK_SWITCH: 'dock:switch',
   PLAYBACK_UPDATE: 'playback:update',
+  PLAYBACK_TOGGLE: 'playback:toggle',
   PLAYBACK_WORD_ADDED: 'playback:word-added',
   WORD_ENRICHED: 'word:enriched',
   WORDS_GET_DETAIL: 'words:getDetail',
@@ -107,6 +118,7 @@ export const IPC_CHANNELS = {
   WORDBOOK_DELETE: 'wordbook:delete',
   WORDBOOK_SET_ACTIVE: 'wordbook:setActive',
   WORDBOOK_IMPORT: 'wordbook:import',
+  WORDBOOK_DOWNLOAD_TEMPLATE: 'wordbook:download-template',
   WORDBOOK_GET_WORDS: 'wordbook:getWords',
   WORDBOOK_ADD_WORD: 'wordbook:addWord',
   WORDBOOK_REMOVE_WORD: 'wordbook:removeWord',
@@ -116,4 +128,6 @@ export const IPC_CHANNELS = {
   TTS_PLAY: 'tts:play',
   WINDOW_OPEN_DETAIL: 'window:open-detail',
   WINDOW_OPEN_WORDBOOK: 'window:open-wordbook',
+  WINDOW_OPEN_SETTINGS: 'window:open-settings',
+  WINDOW_SET_IGNORE_MOUSE_EVENTS: 'window:set-ignore-mouse-events',
 } as const;

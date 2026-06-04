@@ -1,14 +1,7 @@
 import * as fs from 'fs';
-import { WordCreateInput } from '@shared/types';
+import { ImportResult, WordCreateInput } from '@shared/types';
 import { WordRepository } from '../database/wordRepository';
 import { WordBookRepository } from '../database/wordBookRepository';
-
-export interface ImportResult {
-  total: number;
-  imported: number;
-  skipped: number;
-  errors: string[];
-}
 
 export class ImportService {
   private wordRepo = new WordRepository();
@@ -55,7 +48,7 @@ export class ImportService {
     const data = JSON.parse(content);
     if (!Array.isArray(data)) return [];
     
-    return data.map(item => ({
+    return data.map((item): WordCreateInput => ({
       word: item.word || item.name || '',
       meaning: item.meaning || item.translation || '',
       source: 'import'

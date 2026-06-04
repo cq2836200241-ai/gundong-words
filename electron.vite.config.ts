@@ -37,7 +37,8 @@ export default defineConfig({
         input: {
           'scroll-bar': resolve(__dirname, 'src/renderer/scroll-bar.html'),
           'detail': resolve(__dirname, 'src/renderer/detail.html'),
-          'word-book': resolve(__dirname, 'src/renderer/word-book.html')
+          'word-book': resolve(__dirname, 'src/renderer/word-book.html'),
+          'settings': resolve(__dirname, 'src/renderer/settings.html')
         }
       }
     }

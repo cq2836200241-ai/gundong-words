@@ -1,14 +1,28 @@
 import { Tray, Menu, app } from 'electron';
 import path from 'path';
 import { ScrollBarWindowManager } from '../windows/scrollBarWindow';
+import { WordBookWindowManager } from '../windows/wordBookWindow';
+import { SettingsWindowManager } from '../windows/settingsWindow';
+import { WordBookPlaybackService } from '../services/wordBookPlayback';
 import { settingsManager } from '../config/settings';
 
 export class TrayManager {
   private tray: Tray | null = null;
   private scrollManager: ScrollBarWindowManager;
+  private wordBookManager: WordBookWindowManager;
+  private settingsManagerWindow: SettingsWindowManager;
+  private playbackService: WordBookPlaybackService;
 
-  constructor(scrollManager: ScrollBarWindowManager) {
+  constructor(
+    scrollManager: ScrollBarWindowManager, 
+    wordBookManager: WordBookWindowManager,
+    settingsManagerWindow: SettingsWindowManager,
+    playbackService: WordBookPlaybackService
+  ) {
     this.scrollManager = scrollManager;
+    this.wordBookManager = wordBookManager;
+    this.settingsManagerWindow = settingsManagerWindow;
+    this.playbackService = playbackService;
   }
 
   init() {
@@ -32,31 +46,20 @@ export class TrayManager {
     this.tray.on('right-click', () => {
       this.tray?.popUpContextMenu(this.buildMenu());
     });
+    this.tray.on('click', () => {
+      this.settingsManagerWindow.open();
+    });
   }
 
   private buildMenu(): Menu {
+    const isPaused = this.playbackService.isPaused();
     return Menu.buildFromTemplate([
-      { label: '暂停 / 恢复', click: () => { /* Notify via IPC to toggle */ } },
+      { label: isPaused ? '▶ 恢复播放' : '⏸ 暂停播放', click: () => this.playbackService.togglePause() },
       { type: 'separator' },
-      {
-        label: '吸附位置',
-        submenu: [
-          { label: '顶部', type: 'radio', checked: settingsManager.get('dock').position === 'top', click: () => this.scrollManager.switchDock('top') },
-          { label: '左侧', type: 'radio', checked: settingsManager.get('dock').position === 'left', click: () => this.scrollManager.switchDock('left') },
-          { label: '右侧', type: 'radio', checked: settingsManager.get('dock').position === 'right', click: () => this.scrollManager.switchDock('right') }
-        ]
-      },
-      {
-        label: '透明度',
-        submenu: [
-          { label: '100%', click: () => this.scrollManager.setOpacity(1) },
-          { label: '75%', click: () => this.scrollManager.setOpacity(0.75) },
-          { label: '50%', click: () => this.scrollManager.setOpacity(0.5) }
-        ]
-      },
+      { label: '⚙️ 控制面板 (设置)', click: () => this.settingsManagerWindow.open() },
+      { label: '📚 词库管理', click: () => this.wordBookManager.open() },
       { type: 'separator' },
-      { label: '词库管理', click: () => { /* Open wordbook window */ } },
-      { label: '退出', click: () => app.quit() }
+      { label: '❌ 退出程序', click: () => app.quit() }
     ]);
   }
 }

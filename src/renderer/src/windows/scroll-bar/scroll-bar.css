@@ -1,27 +1,47 @@
 /* Word track layout */
+.scroll-bar-container {
+  min-width: 100%;
+  min-height: 100%;
+  pointer-events: none;
+}
+
 .word-track {
   display: flex;
   width: max-content;
+  min-width: 100%;
+  min-height: 100%;
   will-change: transform;
-  pointer-events: auto; /* Required so clicks work on transparent window */
+  pointer-events: none; /* Changed to none for click-through */
+}
+
+.word-group {
+  display: flex;
+  flex-direction: inherit;
+  align-items: center;
 }
 
 /* Horizontal mode */
 .word-track.horizontal {
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
   align-items: center;
+}
+
+.word-track.horizontal .word-group {
+  flex-direction: row;
+  height: 100%;
 }
 
 .word-item.horizontal {
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  padding: 0 30px;
+  align-items: center;
+  padding: 0 85vh;
   white-space: nowrap;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s;
+  pointer-events: auto;
 }
 
 .word-item.horizontal:hover {
@@ -29,14 +49,16 @@
 }
 
 .word-item.horizontal .word-text {
-  font-size: 16px;
+  font-size: 45.7vh;
   font-weight: 600;
-  margin-right: 12px;
+  line-height: 1;
+  margin-right: 34.2vh;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .word-item.horizontal .meaning-text {
-  font-size: 13px;
+  font-size: 37.1vh;
+  line-height: 1;
   color: #ddd;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
@@ -44,18 +66,27 @@
 /* Vertical mode */
 .word-track.vertical {
   flex-direction: column;
-  width: 100vw;
+  width: 100%;
   height: max-content;
+  min-height: 100%;
+  align-items: center;
+}
+
+.word-track.vertical .word-group {
+  flex-direction: column;
+  width: 100%;
 }
 
 .word-item.vertical {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px 0;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  padding: 37.5vw 12.5vw;
+  text-align: center;
   cursor: pointer;
+  pointer-events: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .word-item.vertical:hover {
@@ -63,14 +94,51 @@
 }
 
 .word-item.vertical .word-text {
-  font-size: 16px;
+  font-size: 20vw;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 7.5vw;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .word-item.vertical .meaning-text {
-  font-size: 13px;
+  font-size: 16.2vw;
   color: #ddd;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  word-break: break-word;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  font-size: 40vh; /* Horizontal default */
+  font-weight: 600;
+  letter-spacing: 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.vertical .empty-state {
+  font-size: 17.5vw;
+}
+
+.empty-state span {
+  max-width: calc(100% - 24px);
+  padding: 8px 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.66);
+}
+
+.empty-state.vertical span {
+  white-space: normal;
+  max-width: none;
+  max-height: calc(100% - 24px);
+  text-align: center;
 }

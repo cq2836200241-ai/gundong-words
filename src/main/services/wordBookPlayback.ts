@@ -8,6 +8,18 @@ import { IPC_CHANNELS } from '@shared/types';
 export class WordBookPlaybackService {
   private bookRepo = new WordBookRepository();
   private wordRepo = new WordRepository();
+  private paused: boolean = false;
+
+  isPaused(): boolean {
+    return this.paused;
+  }
+
+  togglePause(): void {
+    this.paused = !this.paused;
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send(IPC_CHANNELS.PLAYBACK_TOGGLE, { isPaused: this.paused });
+    });
+  }
 
   async addWordToActiveBook(wordText: string): Promise<Word | null> {
     let activeBook = this.bookRepo.getActiveBook();
