@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   togglePlayback: () => ipcRenderer.invoke(IPC_CHANNELS.PLAYBACK_TOGGLE),
   getWordDetail: (wordId: number) => ipcRenderer.invoke(IPC_CHANNELS.WORDS_GET_DETAIL, wordId),
   setIgnoreMouseEvents: (ignore: boolean, options?: any) => ipcRenderer.send(IPC_CHANNELS.WINDOW_SET_IGNORE_MOUSE_EVENTS, ignore, options),
+  sendPlaybackProgress: (progress: number) => ipcRenderer.send(IPC_CHANNELS.PLAYBACK_PROGRESS, { progress }),
 
   // Word books
   listWordBooks: () => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_LIST),
@@ -22,7 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setActiveWordBook: (bookId: number) => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_SET_ACTIVE, bookId),
   getWordsInBook: (bookId: number) => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_GET_WORDS, bookId),
   importWordsToBook: (bookId: number) => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_IMPORT, bookId),
-  downloadImportTemplate: () => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_DOWNLOAD_TEMPLATE),
+  downloadImportTemplate: (type?: string) => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_DOWNLOAD_TEMPLATE, type),
   removeWordFromBook: (bookId: number, wordId: number) => ipcRenderer.invoke(IPC_CHANNELS.WORDBOOK_REMOVE_WORD, bookId, wordId),
   
   // Listeners
@@ -44,6 +45,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener(IPC_CHANNELS.PLAYBACK_TOGGLE, handler);
   },
 
+  onPlaybackProgress: (callback: (data: { progress: number }) => void) => {
+    const handler = (_event: any, data: { progress: number }) => callback(data);
+    ipcRenderer.on(IPC_CHANNELS.PLAYBACK_PROGRESS, handler);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.PLAYBACK_PROGRESS, handler);
+  },
+
   onWordAdded: (callback: (data: any) => void) => {
     const handler = (_event: any, data: any) => callback(data);
     ipcRenderer.on(IPC_CHANNELS.PLAYBACK_WORD_ADDED, handler);
@@ -54,5 +61,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const handler = (_event: any, data: any) => callback(data);
     ipcRenderer.on(IPC_CHANNELS.SETTINGS_UPDATE, handler);
     return () => ipcRenderer.removeListener(IPC_CHANNELS.SETTINGS_UPDATE, handler);
+  },
+
+  onWordEnriched: (callback: (data: any) => void) => {
+    const handler = (_event: any, data: any) => callback(data);
+    ipcRenderer.on(IPC_CHANNELS.WORD_ENRICHED, handler);
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.WORD_ENRICHED, handler);
   }
 });

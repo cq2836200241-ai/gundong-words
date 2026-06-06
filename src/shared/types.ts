@@ -40,14 +40,18 @@ export interface WordCreateInput {
   word: string;
   meaning?: string;
   phonetic?: string;
+  partOfSpeech?: string;
   source: 'import' | 'capture' | 'manual';
 }
 
 // === Word Book System ===
+export type WordBookType = 'english' | 'chinese';
+
 export interface WordBook {
   id: number;
   name: string;
   description: string;
+  type: WordBookType;
   isActive: boolean;
   wordCount: number;
   createdAt: string;
@@ -57,6 +61,7 @@ export interface WordBook {
 export interface WordBookCreateInput {
   name: string;
   description?: string;
+  type?: WordBookType;
 }
 
 export interface ImportResult {
@@ -70,7 +75,7 @@ export interface ImportResult {
 export interface AppSettings {
   dock: {
     position: DockPosition;
-    thickness: number;
+    thickness: Record<DockPosition, number>;
     alwaysOnTop: boolean;
   };
   scroll: {
@@ -103,7 +108,7 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  dock: { position: 'top', thickness: 40, alwaysOnTop: true },
+  dock: { position: 'top', thickness: { top: 40, left: 55, right: 55 }, alwaysOnTop: true },
   scroll: { direction: 'forward', speed: 1.0 },
   font: { wordSize: 16, meaningSize: 13 },
   theme: { backgroundColor: '#000000', backgroundOpacity: 0.85, wordColor: '#ffffff', meaningColor: '#dddddd' },
@@ -119,6 +124,7 @@ export const IPC_CHANNELS = {
   DOCK_SWITCH: 'dock:switch',
   PLAYBACK_UPDATE: 'playback:update',
   PLAYBACK_TOGGLE: 'playback:toggle',
+  PLAYBACK_PROGRESS: 'playback:progress',
   PLAYBACK_WORD_ADDED: 'playback:word-added',
   WORD_ENRICHED: 'word:enriched',
   WORDS_GET_DETAIL: 'words:getDetail',

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS word_books (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT,
+  type TEXT DEFAULT 'english',
   is_active BOOLEAN DEFAULT 0,
   word_count INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -59,7 +60,21 @@ class DatabaseManager {
 
     const schemaSql = this.loadSchema();
     this.db.exec(schemaSql);
+    this.ensureSchemaUpgrades();
     this.ensureDemoData();
+  }
+
+  private ensureSchemaUpgrades(): void {
+    if (!this.db) return;
+    try {
+      const columns = this.db.pragma('table_info(word_books)') as any[];
+      const hasType = columns.some(c => c.name === 'type');
+      if (!hasType) {
+        this.db.exec("ALTER TABLE word_books ADD COLUMN type TEXT DEFAULT 'english'");
+      }
+    } catch (e) {
+      console.error('Failed to upgrade schema:', e);
+    }
   }
 
   getDb(): Database.Database {

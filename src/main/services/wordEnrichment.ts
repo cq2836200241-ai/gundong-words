@@ -4,13 +4,13 @@ import { BrowserWindow } from 'electron';
 import { IPC_CHANNELS } from '@shared/types';
 
 export class EnrichmentQueue {
-  private queue: number[] = [];
+  private queue: { wordId: number; bookType: string }[] = [];
   private isProcessing: boolean = false;
   private wordRepo = new WordRepository();
 
-  add(wordId: number) {
-    if (!this.queue.includes(wordId)) {
-      this.queue.push(wordId);
+  add(wordId: number, bookType: string = 'english') {
+    if (!this.queue.some(item => item.wordId === wordId)) {
+      this.queue.push({ wordId, bookType });
     }
     this.processQueue();
   }
@@ -22,11 +22,11 @@ export class EnrichmentQueue {
     this.isProcessing = true;
 
     while (this.queue.length > 0) {
-      const wordId = this.queue.shift()!;
+      const { wordId, bookType } = this.queue.shift()!;
       const word = this.wordRepo.getById(wordId);
       
       if (word && !word.isEnriched) {
-        const result = await deepseekService.enrichWord(word.word);
+        const result = await deepseekService.enrichWord(word.word, bookType);
         if (result) {
           this.wordRepo.update(wordId, {
             phonetic: result.phonetic,
@@ -38,9 +38,10 @@ export class EnrichmentQueue {
             isEnriched: true
           });
 
-          // Notify renderer about the update
+          // Notify renderer with the full updated word data
+          const updatedWord = this.wordRepo.getById(wordId);
           BrowserWindow.getAllWindows().forEach(win => {
-            win.webContents.send(IPC_CHANNELS.WORD_ENRICHED, { wordId });
+            win.webContents.send(IPC_CHANNELS.WORD_ENRICHED, { wordId, word: updatedWord });
           });
         }
       }

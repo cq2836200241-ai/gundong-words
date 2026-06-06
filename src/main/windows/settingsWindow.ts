@@ -13,18 +13,27 @@ export class SettingsWindowManager {
 
     this.window = new BrowserWindow({
       title: '设置',
-      width: 600,
-      height: 550,
-      minWidth: 500,
-      minHeight: 450,
+      width: 420,
+      height: 600,
+      minWidth: 380,
+      minHeight: 500,
       show: false,
-      backgroundColor: '#0a0a14',
+      backgroundColor: '#00000000', // transparent for modern feel
+      titleBarStyle: 'hidden',
+      titleBarOverlay: {
+        color: '#1a1a1e',
+        symbolColor: '#ffffff',
+        height: 38
+      },
+      autoHideMenuBar: true,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         nodeIntegration: false,
         contextIsolation: true
       }
     });
+
+    this.window.removeMenu();
 
     this.window.once('ready-to-show', () => {
       this.window?.show();

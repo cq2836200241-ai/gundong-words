@@ -11,7 +11,7 @@
   min-width: 100%;
   min-height: 100%;
   will-change: transform;
-  pointer-events: none; /* Changed to none for click-through */
+  pointer-events: none;
 }
 
 .word-group {
@@ -38,15 +38,9 @@
   align-items: center;
   padding: 0 calc(max(85vh, 40px) * var(--module-spacing-scale, 1));
   white-space: nowrap;
-  cursor: pointer;
+  pointer-events: none;
   border-radius: 8px;
-  transition: background-color 0.2s;
-  pointer-events: auto;
   flex-shrink: 0;
-}
-
-.word-item.horizontal:hover {
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .word-item.horizontal .word-text {
@@ -54,7 +48,17 @@
   font-weight: 600;
   line-height: 1;
   color: var(--word-color, #ffffff);
-  margin-right: calc(max(30vh, 12px) * var(--word-meaning-gap-scale, 1));
+  margin-right: calc(max(20vh, 8px) * var(--word-meaning-gap-scale, 1));
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  flex-shrink: 0;
+}
+
+.word-item.horizontal .phonetic-text {
+  font-size: max(50vh, 12px);
+  line-height: 1;
+  color: var(--meaning-color, #dddddd);
+  opacity: 0.7;
+  margin-right: calc(max(20vh, 8px) * var(--word-meaning-gap-scale, 1));
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   flex-shrink: 0;
 }
@@ -87,24 +91,27 @@
   align-items: center;
   padding: calc(37.5vw * var(--module-spacing-scale, 1)) 12.5vw;
   text-align: center;
-  cursor: pointer;
-  pointer-events: auto;
+  pointer-events: none;
   width: 100%;
   box-sizing: border-box;
-}
-
-.word-item.vertical:hover {
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .word-item.vertical .word-text {
   font-size: 20vw;
   font-weight: 600;
   color: var(--word-color, #ffffff);
-  margin-bottom: calc(7.5vw * var(--word-meaning-gap-scale, 1));
+  margin-bottom: calc(3vw * var(--word-meaning-gap-scale, 1));
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   white-space: nowrap;
   max-width: 100%;
+}
+
+.word-item.vertical .phonetic-text {
+  font-size: 12vw;
+  color: var(--meaning-color, #dddddd);
+  opacity: 0.7;
+  margin-bottom: calc(3vw * var(--word-meaning-gap-scale, 1));
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .word-item.vertical .meaning-text {
@@ -121,7 +128,7 @@
   width: 100%;
   height: 100%;
   color: #fff;
-  font-size: 40vh; /* Horizontal default */
+  font-size: 40vh;
   font-weight: 600;
   letter-spacing: 0;
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);

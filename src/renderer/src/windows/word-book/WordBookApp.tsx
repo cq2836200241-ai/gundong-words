@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ImportResult, Word, WordBook } from '@shared/types';
+import { ImportResult, Word, WordBook, WordBookType } from '@shared/types';
 
 export function WordBookApp() {
   const [books, setBooks] = useState<WordBook[]>([]);
@@ -10,11 +10,15 @@ export function WordBookApp() {
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [promptValue, setPromptValue] = useState('');
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [promptType, setPromptType] = useState<WordBookType>('english');
 
   const activeBook = useMemo(
     () => books.find((book) => book.id === activeBookId) ?? null,
     [books, activeBookId]
   );
+
+  const englishBooks = useMemo(() => books.filter(b => b.type === 'english' || !b.type), [books]);
+  const chineseBooks = useMemo(() => books.filter(b => b.type === 'chinese'), [books]);
 
   useEffect(() => {
     void loadBooks();
@@ -69,6 +73,7 @@ export function WordBookApp() {
 
   async function createBook(): Promise<void> {
     setPromptValue('');
+    setPromptType('english');
     setIsPromptOpen(true);
   }
 
@@ -82,7 +87,7 @@ export function WordBookApp() {
     setIsPromptOpen(false);
 
     try {
-      const nextBooks = await api.createWordBook({ name: normalizedName });
+      const nextBooks = await api.createWordBook({ name: normalizedName, type: promptType });
       const createdBook = nextBooks.find((book) => book.name === normalizedName) ?? nextBooks.find((book) => book.isActive);
       setBooks(nextBooks);
       await loadBooks(createdBook?.id);
@@ -114,7 +119,7 @@ export function WordBookApp() {
     if (!api) return;
 
     try {
-      const result = await api.downloadImportTemplate();
+      const result = await api.downloadImportTemplate(activeBook?.type);
       if (result) {
         setMessage('模板下载成功。');
       }
@@ -160,25 +165,50 @@ export function WordBookApp() {
   }
 
   return (
-    <div className="word-book-layout">
-      <aside className="sidebar">
+    <>
+      <div className="titlebar-drag-region">
+        <div className="titlebar-title">词库管理</div>
+      </div>
+      <div className="word-book-layout">
+        <aside className="sidebar">
         <div className="sidebar-header">
           <h2>词库管理</h2>
           <span>{books.length}</span>
         </div>
 
-        <ul className="book-list">
-          {books.map((book) => (
-            <li
-              key={book.id}
-              className={book.id === activeBookId ? 'active' : ''}
-              onClick={() => void selectBook(book.id)}
-            >
-              <span className="book-name">{book.name}</span>
-              <span className="count">{book.wordCount}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="book-category">
+          <div className="category-title" style={{ padding: '8px 16px', fontSize: '12px', color: '#888' }}>英语词库</div>
+          <ul className="book-list">
+            {englishBooks.map((book) => (
+              <li
+                key={book.id}
+                className={book.id === activeBookId ? 'active' : ''}
+                onClick={() => void selectBook(book.id)}
+              >
+                <span className="book-name">{book.name}</span>
+                <span className="count">{book.wordCount}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {chineseBooks.length > 0 && (
+          <div className="book-category">
+            <div className="category-title" style={{ padding: '8px 16px', fontSize: '12px', color: '#888' }}>词语词库</div>
+            <ul className="book-list">
+              {chineseBooks.map((book) => (
+                <li
+                  key={book.id}
+                  className={book.id === activeBookId ? 'active' : ''}
+                  onClick={() => void selectBook(book.id)}
+                >
+                  <span className="book-name">{book.name}</span>
+                  <span className="count">{book.wordCount}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <button className="create-btn" onClick={() => void createBook()}>
           + 新建词库
@@ -215,9 +245,9 @@ export function WordBookApp() {
             <table className="word-table">
               <thead>
                 <tr>
-                  <th>单词</th>
-                  <th>音标</th>
-                  <th>词性</th>
+                  <th>{activeBook?.type === 'chinese' ? '词语' : '单词'}</th>
+                  <th>{activeBook?.type === 'chinese' ? '拼音' : '音标'}</th>
+                  {activeBook?.type !== 'chinese' && <th>词性</th>}
                   <th>释义</th>
                   <th>来源</th>
                   <th>状态</th>
@@ -229,7 +259,7 @@ export function WordBookApp() {
                   <tr key={word.id}>
                     <td className="font-bold">{word.word}</td>
                     <td>{word.phonetic || '-'}</td>
-                    <td>{word.partOfSpeech || '-'}</td>
+                    {activeBook?.type !== 'chinese' && <td>{word.partOfSpeech || '-'}</td>}
                     <td>{word.meaning || '-'}</td>
                     <td>{sourceLabel(word.source)}</td>
                     <td>{word.isEnriched ? '已完善' : '待补全'}</td>
@@ -261,6 +291,26 @@ export function WordBookApp() {
                 if (e.key === 'Escape') setIsPromptOpen(false);
               }}
             />
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', marginTop: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="bookType" 
+                  checked={promptType === 'english'} 
+                  onChange={() => setPromptType('english')} 
+                />
+                英语词库
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="bookType" 
+                  checked={promptType === 'chinese'} 
+                  onChange={() => setPromptType('chinese')} 
+                />
+                词语词库
+              </label>
+            </div>
             <div className="prompt-actions">
               <button onClick={() => setIsPromptOpen(false)}>取消</button>
               <button className="primary" onClick={() => void submitCreateBook()}>确定</button>
@@ -284,6 +334,7 @@ export function WordBookApp() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

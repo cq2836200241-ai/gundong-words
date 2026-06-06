@@ -19,8 +19,8 @@ export class WordBookRepository {
 
   create(input: WordBookCreateInput): WordBook {
     const db = dbManager.getDb();
-    const stmt = db.prepare('INSERT INTO word_books (name, description) VALUES (?, ?)');
-    const info = stmt.run(input.name, input.description || null);
+    const stmt = db.prepare('INSERT INTO word_books (name, description, type) VALUES (?, ?, ?)');
+    const info = stmt.run(input.name, input.description || null, input.type || 'english');
     return this.getById(info.lastInsertRowid as number)!;
   }
 
@@ -106,6 +106,7 @@ export class WordBookRepository {
       id: row.id,
       name: row.name,
       description: row.description,
+      type: row.type || 'english',
       isActive: Boolean(row.is_active),
       wordCount: row.word_count,
       createdAt: row.created_at,

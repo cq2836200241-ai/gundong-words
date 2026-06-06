@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS word_books (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT,
+  type TEXT DEFAULT 'english',
   is_active BOOLEAN DEFAULT 0,
   word_count INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

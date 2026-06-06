@@ -15,7 +15,6 @@ export function WordTrack({ words, orientation, direction, speed, isGlobalPaused
   const trackRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
   const [copies, setCopies] = useState(2);
-  const [isHovered, setIsHovered] = useState(false);
   
   useScrollAnimation(
     trackRef, 
@@ -25,7 +24,7 @@ export function WordTrack({ words, orientation, direction, speed, isGlobalPaused
     orientation, 
     direction, 
     speed,
-    isHovered || isGlobalPaused
+    isGlobalPaused
   );
 
   // Dynamically calculate how many copies we need to fill the screen
@@ -42,7 +41,6 @@ export function WordTrack({ words, orientation, direction, speed, isGlobalPaused
       
       if (groupSize === 0) return;
       
-      // We need enough copies to fill the viewport PLUS one extra copy for smooth scrolling
       const requiredCopies = Math.ceil(viewportSize / groupSize) + 1;
       
       if (requiredCopies !== copies && requiredCopies > 1) {
@@ -52,7 +50,6 @@ export function WordTrack({ words, orientation, direction, speed, isGlobalPaused
       }
     };
 
-    // Give the browser a moment to render the first group before measuring
     requestAnimationFrame(checkSize);
     window.addEventListener('resize', checkSize);
     return () => window.removeEventListener('resize', checkSize);
@@ -70,28 +67,24 @@ export function WordTrack({ words, orientation, direction, speed, isGlobalPaused
     <div 
       className={`word-track ${orientation}`} 
       ref={trackRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Primary group that we measure */}
       <div className="word-group" ref={groupRef}>
         {words.map((word, index) => (
           <WordItem 
             key={`${word.id}-${index}`} 
             word={word} 
-            orientation={orientation} 
+            orientation={orientation}
           />
         ))}
       </div>
       
-      {/* Additional copies to ensure seamless scrolling */}
       {Array.from({ length: copies - 1 }).map((_, i) => (
         <div className="word-group" key={i}>
           {words.map((word, index) => (
             <WordItem 
               key={`copy-${i}-${word.id}-${index}`} 
               word={word} 
-              orientation={orientation} 
+              orientation={orientation}
             />
           ))}
         </div>

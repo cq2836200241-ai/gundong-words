@@ -18,13 +18,22 @@ export class WordBookWindowManager {
       minWidth: 760,
       minHeight: 480,
       show: false,
-      backgroundColor: '#0a0a14',
+      backgroundColor: '#00000000', // transparent for modern feel
+      titleBarStyle: 'hidden',
+      titleBarOverlay: {
+        color: '#0a0a14',
+        symbolColor: '#ffffff',
+        height: 38
+      },
+      autoHideMenuBar: true,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         nodeIntegration: false,
         contextIsolation: true
       }
     });
+
+    this.window.removeMenu();
 
     this.window.once('ready-to-show', () => {
       this.window?.show();

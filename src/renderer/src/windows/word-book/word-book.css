@@ -6,6 +6,29 @@
   min-height: 480px;
   overflow: hidden;
   background: var(--bg-color);
+  padding-top: 38px; /* Push down for titlebar */
+}
+
+/* Custom Titlebar Drag Area */
+.titlebar-drag-region {
+  height: 38px;
+  width: 100%;
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.titlebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .sidebar {

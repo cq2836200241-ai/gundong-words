@@ -23,9 +23,12 @@ export class ScrollBarWindowManager {
       backgroundColor: '#00000000',
       frame: false,
       alwaysOnTop: settingsManager.get('dock').alwaysOnTop ?? true,
-      skipTaskbar: !isDev,
+      skipTaskbar: true, // Always skip taskbar to behave like an overlay
       resizable: false,
-      focusable: isDev,
+      focusable: false, // Never focusable to prevent stealing focus
+      hasShadow: false,
+      type: 'toolbar', // System level toolbar behavior
+      acceptFirstMouse: false,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         nodeIntegration: false,
@@ -33,6 +36,7 @@ export class ScrollBarWindowManager {
       }
     });
 
+    this.window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
     this.window.setIgnoreMouseEvents(true, { forward: true });
 
     this.window.webContents.on('did-finish-load', () => {
@@ -69,7 +73,8 @@ export class ScrollBarWindowManager {
     const workArea = display.workAreaSize;
     const fullSize = display.size;
     
-    const thickness = settingsManager.get('dock').thickness;
+    const thicknessMap = settingsManager.get('dock').thickness;
+    const thickness = thicknessMap[position] || 40;
     
     let bounds = { x: 0, y: 0, width: 0, height: 0 };
     let orientation = 'horizontal';

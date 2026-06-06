@@ -1,8 +1,12 @@
-import { motion } from 'framer-motion';
 import { Word } from '@shared/types';
 import { useRef, useLayoutEffect, useState } from 'react';
 
-export function WordItem({ word, orientation }: { word: Word; orientation: string }) {
+interface WordItemProps {
+  word: Word;
+  orientation: string;
+}
+
+export function WordItem({ word, orientation }: WordItemProps) {
   const textRef = useRef<HTMLSpanElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -22,24 +26,11 @@ export function WordItem({ word, orientation }: { word: Word; orientation: strin
     }
   }, [word.word, orientation]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!window.electronAPI) return;
-    void window.electronAPI.openWordDetail(word.id);
-  };
+  // Build the meaning display: "v. 放弃；抛弃" or just "放弃；抛弃"
+  const meaningDisplay = [word.partOfSpeech, word.meaning].filter(Boolean).join(' ');
 
   return (
-    <motion.div 
-      className={`word-item ${orientation}`}
-      onClick={handleClick}
-      onMouseEnter={() => window.electronAPI?.setIgnoreMouseEvents?.(false)}
-      onMouseLeave={() => window.electronAPI?.setIgnoreMouseEvents?.(true, { forward: true })}
-      whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-      // Flash effect if newly captured/imported
-      initial={word.source === 'capture' ? { backgroundColor: 'rgba(255,200,0,0.5)' } : {}}
-      animate={{ backgroundColor: 'rgba(255,255,255,0)' }}
-      transition={{ duration: 1.5 }}
-    >
+    <div className={`word-item ${orientation}`}>
       <span 
         className="word-text" 
         ref={textRef}
@@ -51,7 +42,8 @@ export function WordItem({ word, orientation }: { word: Word; orientation: strin
       >
         {word.word}
       </span>
-      {word.meaning && <span className="meaning-text">{word.meaning}</span>}
-    </motion.div>
+      {word.phonetic && <span className="phonetic-text">{word.phonetic}</span>}
+      {meaningDisplay && <span className="meaning-text">{meaningDisplay}</span>}
+    </div>
   );
 }

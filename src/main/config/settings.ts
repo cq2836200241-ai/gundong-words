@@ -9,6 +9,13 @@ export class SettingsManager {
       name: 'settings',
       defaults: DEFAULT_SETTINGS,
     });
+
+    // Migration: Convert legacy number thickness to record
+    const dock = this.store.get('dock');
+    if (dock && typeof dock.thickness === 'number') {
+      const val = dock.thickness as number;
+      this.store.set('dock.thickness', { top: val, left: val, right: val });
+    }
   }
 
   get<K extends keyof AppSettings>(key: K): AppSettings[K] {

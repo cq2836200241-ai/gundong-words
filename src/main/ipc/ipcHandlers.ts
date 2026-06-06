@@ -71,6 +71,14 @@ export function setupIpcHandlers(
     playbackService.togglePause();
   });
 
+  ipcMain.on(IPC_CHANNELS.PLAYBACK_PROGRESS, (event, data) => {
+    BrowserWindow.getAllWindows().forEach(win => {
+      if (win.webContents !== event.sender) {
+        win.webContents.send(IPC_CHANNELS.PLAYBACK_PROGRESS, data);
+      }
+    });
+  });
+
   // Word books
   ipcMain.handle(IPC_CHANNELS.WORDBOOK_LIST, () => {
     return bookRepo.getAll();
@@ -130,17 +138,22 @@ export function setupIpcHandlers(
     }
 
     const importResult = await importService.importFromFile(result.filePaths[0], bookId);
+    
+    // Auto-play the newly imported book
+    bookRepo.setActive(bookId);
     broadcastPlaybackForBook(bookId);
+    
     return importResult;
   });
 
-  ipcMain.handle(IPC_CHANNELS.WORDBOOK_DOWNLOAD_TEMPLATE, async () => {
+  ipcMain.handle(IPC_CHANNELS.WORDBOOK_DOWNLOAD_TEMPLATE, async (_, type?: string) => {
+    const isChinese = type === 'chinese';
     const result = await dialog.showSaveDialog({
       title: '保存导入模板',
-      defaultPath: 'word_import_template.csv',
+      defaultPath: isChinese ? 'chinese_words_template.json' : 'word_import_template.json',
       filters: [
+        { name: 'JSON 文件 (推荐)', extensions: ['json'] },
         { name: 'CSV 文件', extensions: ['csv'] },
-        { name: 'JSON 文件', extensions: ['json'] },
         { name: 'TXT 文件', extensions: ['txt'] }
       ]
     });
@@ -150,16 +163,41 @@ export function setupIpcHandlers(
     const ext = result.filePath.split('.').pop()?.toLowerCase();
     let content = '';
 
-    if (ext === 'csv') {
-      content = 'word,meaning\napple,苹果\nbanana,香蕉\ncomputer,电脑';
-    } else if (ext === 'json') {
-      content = JSON.stringify([
-        { word: 'apple', meaning: '苹果' },
-        { word: 'banana', meaning: '香蕉' },
-        { word: 'computer', meaning: '电脑' }
-      ], null, 2);
+    if (ext === 'json') {
+      if (isChinese) {
+        content = JSON.stringify({
+          template: '滚动单词学习-词语词库模板',
+          version: 1,
+          instructions: '请在 words 数组中按格式添加词语。词语=中文词语, 解释=中文释义。',
+          words: [
+            { "词语": '朝三暮四', "解释": '比喻常常变卦，反复无常。' },
+            { "词语": '袖手旁观', "解释": '比喻置身事外，不予协助或不过问。' }
+          ]
+        }, null, 2);
+      } else {
+        content = JSON.stringify({
+          template: '滚动单词学习-词库模板',
+          version: 1,
+          instructions: '请在 words 数组中按格式添加单词。word=英文单词, phonetic=音标(用斜杠包裹), partOfSpeech=词性(如 n./v./adj./adv.), meaning=中文释义。所有字段均为字符串类型。',
+          words: [
+            { word: 'abandon', phonetic: '/əˈbændən/', partOfSpeech: 'v.', meaning: '放弃；抛弃' },
+            { word: 'abstract', phonetic: '/ˈæbstrækt/', partOfSpeech: 'adj.', meaning: '抽象的' },
+            { word: 'acknowledge', phonetic: '/əkˈnɒlɪdʒ/', partOfSpeech: 'v.', meaning: '承认；确认' }
+          ]
+        }, null, 2);
+      }
+    } else if (ext === 'csv') {
+      if (isChinese) {
+        content = '词语,解释\n朝三暮四,比喻常常变卦，反复无常。\n袖手旁观,比喻置身事外，不予协助或不过问。';
+      } else {
+        content = 'word,phonetic,partOfSpeech,meaning\nabandon,/əˈbændən/,v.,放弃；抛弃\nabstract,/ˈæbstrækt/,adj.,抽象的\nacknowledge,/əkˈnɒlɪdʒ/,v.,承认；确认';
+      }
     } else if (ext === 'txt') {
-      content = 'apple 苹果\nbanana 香蕉\ncomputer 电脑';
+      if (isChinese) {
+        content = '朝三暮四\t比喻常常变卦，反复无常。\n袖手旁观\t比喻置身事外，不予协助或不过问。';
+      } else {
+        content = 'abandon\t/əˈbændən/\tv.\t放弃；抛弃\nabstract\t/ˈæbstrækt/\tadj.\t抽象的\nacknowledge\t/əkˈnɒlɪdʒ/\tv.\t承认；确认';
+      }
     }
 
     try {

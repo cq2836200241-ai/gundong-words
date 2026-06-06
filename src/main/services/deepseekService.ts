@@ -28,10 +28,28 @@ export class DeepSeekService {
     return this.client !== null;
   }
 
-  async enrichWord(word: string): Promise<WordEnrichmentResult | null> {
+  async enrichWord(word: string, bookType: string = 'english'): Promise<WordEnrichmentResult | null> {
     if (!this.client) return null;
 
-    const prompt = `
+    let prompt = '';
+    
+    if (bookType === 'chinese') {
+      prompt = `
+You are a professional Chinese dictionary. For the Chinese word or idiom "${word}", provide:
+{
+  "phonetic": "Pinyin (e.g., zhāo sān mù sì)",
+  "part_of_speech": "",
+  "meaning": "Chinese explanation (concise, max 20 characters)",
+  "examples": [
+    {"en": "", "zh": "A Chinese example sentence using this word"}
+  ],
+  "synonyms": ["synonym1", "synonym2"],
+  "antonyms": ["antonym1"]
+}
+Respond with ONLY the JSON object, no markdown wrappers, no other text.
+`;
+    } else {
+      prompt = `
 You are a professional English dictionary. For the word "${word}", provide:
 {
   "phonetic": "IPA phonetic transcription",
@@ -46,6 +64,7 @@ You are a professional English dictionary. For the word "${word}", provide:
 }
 Respond with ONLY the JSON object, no markdown wrappers, no other text.
 `;
+    }
 
     try {
       const response = await this.client.chat.completions.create({

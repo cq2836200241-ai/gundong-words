@@ -32,7 +32,7 @@ export class WordBookPlaybackService {
     this.bookRepo.addWord(activeBook.id, word.id);
 
     if (!word.isEnriched) {
-      enrichmentQueue.add(word.id);
+      enrichmentQueue.add(word.id, activeBook.type || 'english');
     }
 
     // Broadcast newly added word to the scroll bar

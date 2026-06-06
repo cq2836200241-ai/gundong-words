@@ -31,6 +31,11 @@ export default defineConfig({
         '@shared': resolve('src/shared')
       }
     },
+    server: {
+      watch: {
+        usePolling: true
+      }
+    },
     plugins: [react()],
     build: {
       rollupOptions: {

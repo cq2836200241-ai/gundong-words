@@ -98,9 +98,15 @@ export function ScrollBarApp() {
       setWords(prev => [data.word, ...prev]);
     });
 
+    const unWordEnriched = api.onWordEnriched?.((data: { wordId: number; word: Word }) => {
+      if (data.word) {
+        setWords(prev => prev.map(w => w.id === data.wordId ? data.word : w));
+      }
+    });
+
     const unSettings = api.onSettingsUpdate((partial: Partial<AppSettings>) => {
-      if (partial.scroll?.direction) setDirection(partial.scroll.direction);
-      if (partial.scroll?.speed) setSpeed(partial.scroll.speed);
+      if (partial.scroll?.direction !== undefined) setDirection(partial.scroll.direction);
+      if (partial.scroll?.speed !== undefined) setSpeed(partial.scroll.speed);
       if (partial.theme) setTheme(prev => ({ ...prev, ...partial.theme }));
       if (partial.layout) setLayout(prev => ({ ...prev, ...partial.layout }));
     });
@@ -108,6 +114,7 @@ export function ScrollBarApp() {
     return () => {
       unDock(); unUpdate(); unWordAdded(); unSettings();
       if (unPlaybackToggle) unPlaybackToggle();
+      if (unWordEnriched) unWordEnriched();
     };
   }, []);
 

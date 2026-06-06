@@ -14,12 +14,20 @@ export class WordRepository {
     const existing = this.findByWord(input.word);
     if (existing) return existing;
 
+    const isComplete = !!(input.meaning && input.phonetic && input.partOfSpeech);
     const stmt = db.prepare(`
-      INSERT INTO words (word, meaning, phonetic, source, is_enriched)
-      VALUES (?, ?, ?, ?, 0)
+      INSERT INTO words (word, meaning, phonetic, part_of_speech, source, is_enriched)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
     
-    const info = stmt.run(input.word, input.meaning || null, input.phonetic || null, input.source);
+    const info = stmt.run(
+      input.word,
+      input.meaning || null,
+      input.phonetic || null,
+      input.partOfSpeech || null,
+      input.source,
+      isComplete ? 1 : 0
+    );
     return this.getById(info.lastInsertRowid as number)!;
   }
 

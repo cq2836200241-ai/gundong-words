@@ -14,7 +14,7 @@ export interface ElectronAPI {
   setActiveWordBook: (bookId: number) => Promise<WordBook[]>;
   getWordsInBook: (bookId: number) => Promise<Word[]>;
   importWordsToBook: (bookId: number) => Promise<ImportResult | null>;
-  downloadImportTemplate: () => Promise<boolean>;
+  downloadImportTemplate: (type?: string) => Promise<boolean>;
   removeWordFromBook: (bookId: number, wordId: number) => Promise<Word[]>;
   
   onDockChanged: (callback: (data: DockChangeEvent) => void) => () => void;
@@ -22,6 +22,7 @@ export interface ElectronAPI {
   onPlaybackToggle: (callback: (data: { isPaused: boolean }) => void) => () => void;
   onWordAdded: (callback: (data: { word: Word; bookId: number }) => void) => () => void;
   onSettingsUpdate: (callback: (data: Partial<AppSettings>) => void) => () => void;
+  onWordEnriched: (callback: (data: { wordId: number; word: Word }) => void) => () => void;
 }
 
 declare global {
