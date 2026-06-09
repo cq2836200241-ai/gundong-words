@@ -23,6 +23,8 @@ export interface ElectronAPI {
   onWordAdded: (callback: (data: { word: Word; bookId: number }) => void) => () => void;
   onSettingsUpdate: (callback: (data: Partial<AppSettings>) => void) => () => void;
   onWordEnriched: (callback: (data: { wordId: number; word: Word }) => void) => () => void;
+  sendPlaybackProgress: (progress: number) => void;
+  onPlaybackProgress: (callback: (data: any) => void) => () => void;
 }
 
 declare global {

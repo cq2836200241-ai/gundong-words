@@ -19,6 +19,7 @@ export function WordBookApp() {
 
   const englishBooks = useMemo(() => books.filter(b => b.type === 'english' || !b.type), [books]);
   const chineseBooks = useMemo(() => books.filter(b => b.type === 'chinese'), [books]);
+  const newsBooks = useMemo(() => books.filter(b => b.type === 'news'), [books]);
 
   useEffect(() => {
     void loadBooks();
@@ -210,6 +211,24 @@ export function WordBookApp() {
           </div>
         )}
 
+        {newsBooks.length > 0 && (
+          <div className="book-category">
+            <div className="category-title" style={{ padding: '8px 16px', fontSize: '12px', color: '#888' }}>资讯订阅</div>
+            <ul className="book-list">
+              {newsBooks.map((book) => (
+                <li
+                  key={book.id}
+                  className={book.id === activeBookId ? 'active' : ''}
+                  onClick={() => void selectBook(book.id)}
+                >
+                  <span className="book-name">{book.name}</span>
+                  <span className="count">{book.wordCount}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <button className="create-btn" onClick={() => void createBook()}>
           + 新建词库
         </button>
@@ -245,10 +264,10 @@ export function WordBookApp() {
             <table className="word-table">
               <thead>
                 <tr>
-                  <th>{activeBook?.type === 'chinese' ? '词语' : '单词'}</th>
-                  <th>{activeBook?.type === 'chinese' ? '拼音' : '音标'}</th>
-                  {activeBook?.type !== 'chinese' && <th>词性</th>}
-                  <th>释义</th>
+                  <th>{activeBook?.type === 'news' ? '标题' : activeBook?.type === 'chinese' ? '词语' : '单词'}</th>
+                  <th>{activeBook?.type === 'news' ? '时间/其他' : activeBook?.type === 'chinese' ? '拼音' : '音标'}</th>
+                  {activeBook?.type !== 'chinese' && activeBook?.type !== 'news' && <th>词性</th>}
+                  <th>{activeBook?.type === 'news' ? '摘要' : '释义'}</th>
                   <th>来源</th>
                   <th>状态</th>
                   <th></th>
@@ -259,7 +278,7 @@ export function WordBookApp() {
                   <tr key={word.id}>
                     <td className="font-bold">{word.word}</td>
                     <td>{word.phonetic || '-'}</td>
-                    {activeBook?.type !== 'chinese' && <td>{word.partOfSpeech || '-'}</td>}
+                    {activeBook?.type !== 'chinese' && activeBook?.type !== 'news' && <td>{word.partOfSpeech || '-'}</td>}
                     <td>{word.meaning || '-'}</td>
                     <td>{sourceLabel(word.source)}</td>
                     <td>{word.isEnriched ? '已完善' : '待补全'}</td>

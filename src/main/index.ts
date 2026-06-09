@@ -7,6 +7,8 @@ import { GlobalHotkey } from './hotkeys/globalHotkey';
 import { dbManager } from './database/db';
 import { setupIpcHandlers } from './ipc/ipcHandlers';
 import { WordBookPlaybackService } from './services/wordBookPlayback';
+import { AihotFeedService } from './services/aihotFeed';
+import { GithubFeedService } from './services/githubFeed';
 import { settingsManager } from './config/settings';
 import { SettingsWindowManager } from './windows/settingsWindow';
 
@@ -15,6 +17,8 @@ let wordBookManager: WordBookWindowManager;
 let detailWindowManager: DetailWindowManager;
 let settingsWindowManager: SettingsWindowManager;
 let trayManager: TrayManager;
+let aihotFeedService: AihotFeedService;
+let githubFeedService: GithubFeedService;
 let hotkey: GlobalHotkey | null = null;
 
 process.on('uncaughtException', (err) => {
@@ -61,6 +65,12 @@ app.whenReady().then(async () => {
     playbackService.refresh();
 
   });
+
+  aihotFeedService = new AihotFeedService();
+  aihotFeedService.start();
+
+  githubFeedService = new GithubFeedService();
+  githubFeedService.start();
 
   trayManager = new TrayManager(scrollBarManager, wordBookManager, settingsWindowManager, playbackService);
   trayManager.init();

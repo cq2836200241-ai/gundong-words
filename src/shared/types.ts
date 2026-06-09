@@ -25,7 +25,7 @@ export interface Word {
   examples: ExampleSentence[] | null;
   synonyms: string[] | null;
   antonyms: string[] | null;
-  source: 'import' | 'capture' | 'manual';
+  source: 'import' | 'capture' | 'manual' | 'aihot';
   isEnriched: boolean;
   createdAt: string;
   updatedAt: string;
@@ -41,11 +41,11 @@ export interface WordCreateInput {
   meaning?: string;
   phonetic?: string;
   partOfSpeech?: string;
-  source: 'import' | 'capture' | 'manual';
+  source: 'import' | 'capture' | 'manual' | 'aihot';
 }
 
 // === Word Book System ===
-export type WordBookType = 'english' | 'chinese';
+export type WordBookType = 'english' | 'chinese' | 'news';
 
 export interface WordBook {
   id: number;
